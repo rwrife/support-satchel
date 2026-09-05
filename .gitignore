@@ -1,0 +1,24 @@
+# Build artifacts
+bin/
+obj/
+out/
+
+# User and IDE
+.vs/
+.vscode/
+*.user
+*.suo
+
+# Test outputs
+TestResults/
+coverage/
+*.trx
+
+# Local app data
+*.db
+*.db-shm
+*.db-wal
+artifacts/
+
+# macOS
+.DS_Store
