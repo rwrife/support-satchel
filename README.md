@@ -63,7 +63,8 @@ Troubleshooting usually means scrambling across folders, grabbing the wrong file
 
 ## Current status
 
-Scaffold and issue backlog created. Implementation has not started.
+Issue #1 complete: .NET 8 solution skeleton (`Core`/`App`/`Cli` + xUnit tests)
+with Windows/macOS CI. Feature implementation proceeds via the issue backlog.
 
 ## Milestones
 

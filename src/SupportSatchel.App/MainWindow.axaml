@@ -1,0 +1,10 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="SupportSatchel.App.MainWindow"
+        Width="800" Height="500"
+        Title="Support Satchel">
+  <StackPanel Margin="24" Spacing="8">
+    <TextBlock Text="Support Satchel" FontSize="24" />
+    <TextBlock Text="Skeleton build. UI workflows arrive with issue #6." />
+  </StackPanel>
+</Window>

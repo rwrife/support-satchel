@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  build-test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      # Pin third-party actions to exact commit SHAs of the current majors
+      # (checkout v7.0.1, setup-dotnet v6.0.0) for supply-chain integrity.
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Setup .NET SDK (pinned by global.json)
+        uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
+        with:
+          global-json-file: global.json
+
+      - name: Restore (locked mode)
+        run: dotnet restore SupportSatchel.sln --locked-mode
+
+      - name: Format check
+        run: dotnet format SupportSatchel.sln --verify-no-changes --no-restore
+
+      - name: Build (Release)
+        run: dotnet build SupportSatchel.sln --configuration Release --no-restore
+
+      - name: Test (Release)
+        run: dotnet test SupportSatchel.sln --configuration Release --no-build
+
+      - name: Dependency vulnerability scan
+        run: dotnet list SupportSatchel.sln package --vulnerable --include-transitive
