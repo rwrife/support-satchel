@@ -1,9 +1,9 @@
 namespace SupportSatchel.Core;
 
 /// <summary>
-/// Placeholder identity for the core library. The real domain model
-/// (BundleProfile, CaptureSource, BundleArtifact, RedactionRule) lands
-/// with issue #2.
+/// Placeholder identity for the core library, used by the skeleton smoke
+/// test. The real domain model lives in <c>SupportSatchel.Core.Domain</c>
+/// and SQLite-backed persistence in <c>SupportSatchel.Core.Storage</c>.
 /// </summary>
 public static class CoreInfo
 {
