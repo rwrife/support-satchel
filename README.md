@@ -63,8 +63,11 @@ Troubleshooting usually means scrambling across folders, grabbing the wrong file
 
 ## Current status
 
-Issue #1 complete: .NET 8 solution skeleton (`Core`/`App`/`Cli` + xUnit tests)
-with Windows/macOS CI. Feature implementation proceeds via the issue backlog.
+Issue #2 complete: profile domain model (`BundleProfile`, `CaptureSource`,
+`RedactionRule`, `ExportOptions`, `RunRecord`) with validation, canonical
+JSON serialization, and SQLite persistence + migration strategy
+([`docs/persistence.md`](./docs/persistence.md)). Collector pipeline and
+remaining features proceed via the issue backlog.
 
 ## Milestones
 
@@ -90,4 +93,5 @@ dotnet test
 ## Repository notes
 
 - Roadmap and execution plan: [`PLAN.md`](./PLAN.md)
-- This repo is currently documentation/backlog only.
+- Persistence schema + migration strategy: [`docs/persistence.md`](./docs/persistence.md)
+- Core domain and local persistence are implemented; UI/CLI workflows are backlog items.
