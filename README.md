@@ -63,11 +63,17 @@ Troubleshooting usually means scrambling across folders, grabbing the wrong file
 
 ## Current status
 
-Issue #2 complete: profile domain model (`BundleProfile`, `CaptureSource`,
-`RedactionRule`, `ExportOptions`, `RunRecord`) with validation, canonical
-JSON serialization, and SQLite persistence + migration strategy
-([`docs/persistence.md`](./docs/persistence.md)). Collector pipeline and
-remaining features proceed via the issue backlog.
+Issue #4 complete: redaction engine (`SupportSatchel.Core.Redacting`)
+applies profile rules to staged collector copies only, exposes
+per-artifact original-vs-redacted previews for the review step, and emits
+a deterministic `redaction-report.json`; documented pattern limits live
+in [`docs/redaction.md`](./docs/redaction.md). Earlier: issue #2 profile
+domain model (`BundleProfile`, `CaptureSource`, `RedactionRule`,
+`ExportOptions`, `RunRecord`) with validation, canonical JSON
+serialization, and SQLite persistence + migration strategy
+([`docs/persistence.md`](./docs/persistence.md)); issue #3 collector
+pipeline with staging + provenance. Packaging, UI, and CLI proceed via
+the issue backlog.
 
 ## Milestones
 
@@ -94,4 +100,5 @@ dotnet test
 
 - Roadmap and execution plan: [`PLAN.md`](./PLAN.md)
 - Persistence schema + migration strategy: [`docs/persistence.md`](./docs/persistence.md)
+- Redaction engine semantics + documented limits: [`docs/redaction.md`](./docs/redaction.md)
 - Core domain and local persistence are implemented; UI/CLI workflows are backlog items.
