@@ -138,6 +138,38 @@ public class BundleExporterTests : IDisposable
     }
 
     [Fact]
+    public void ExportSanitizesReportSnippetsAndNoArchiveEntryContainsFixtureSecret()
+    {
+        const string Secret = "archive.fixture@example.test";
+        WriteFixture("logs/app.log", $"contact {Secret}\n");
+        var profile = ProfileWith(new CaptureSource
+        {
+            Id = "src-logs",
+            Kind = SourceKind.Folder,
+            Path = Path.Combine(root, "logs"),
+        });
+        var collected = new Collector(new List<IDiagnosticProbe>())
+            .Run(profile, Path.Combine(root, "ws"), Options());
+        var redaction = new RedactionEngine().ApplyWorkspace(collected, profile.Redaction, ReportOptions());
+
+        Assert.Contains(Secret, Assert.Single(Assert.Single(redaction.Artifacts).Matches).Snippet, StringComparison.Ordinal);
+
+        var result = new BundleExporter().Export(
+            profile, collected, Path.Combine(root, "out"), new PackagingOptions { Clock = () => FixedNow });
+        var entries = ReadZip(result.BundlePath);
+
+        foreach (var (entryName, bytes) in entries)
+        {
+            Assert.DoesNotContain(Secret, Encoding.UTF8.GetString(bytes), StringComparison.Ordinal);
+        }
+
+        var exportedReport = RedactionReportJson.Deserialize(
+            Encoding.UTF8.GetString(entries[RedactionEngine.ReportFileName]));
+        Assert.NotNull(exportedReport);
+        Assert.Equal("[REDACTED]", Assert.Single(Assert.Single(exportedReport!.Artifacts).Matches).Snippet);
+    }
+
+    [Fact]
     public void IdenticalInputProducesByteStableBundleAndManifest()
     {
         WriteFixture("logs/a.log", "alpha token:abcdefghijklmno\n");
