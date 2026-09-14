@@ -89,6 +89,12 @@ public static class ProfileValidator
             {
                 issues.Add(new ValidationIssue($"{prefix}.id", "Source id is required."));
             }
+            else if (!IsSafePathSegment(source.Id))
+            {
+                issues.Add(new ValidationIssue(
+                    $"{prefix}.id",
+                    "Source id must be a safe single path segment using letters, digits, '.', '_', or '-'."));
+            }
             else if (!seenSourceIds.Add(source.Id))
             {
                 issues.Add(new ValidationIssue($"{prefix}.id", $"Duplicate source id '{source.Id}'."));
@@ -218,5 +224,23 @@ public static class ProfileValidator
         {
             return false;
         }
+    }
+
+    internal static bool IsSafePathSegment(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value) || value is "." or "..")
+        {
+            return false;
+        }
+
+        foreach (var character in value)
+        {
+            if (!char.IsAsciiLetterOrDigit(character) && character is not '.' and not '_' and not '-')
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

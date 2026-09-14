@@ -77,11 +77,18 @@ public sealed class BundleExporter
         options ??= new PackagingOptions();
         var now = options.Clock();
 
-        LoadRedactionGate(collection.WorkspacePath);
-
-        var entries = new List<(string EntryPath, string FullPath)>
+        var report = LoadRedactionGate(collection.WorkspacePath);
+        var exportedReport = report with
         {
-            (ReportEntryName, Path.Combine(collection.WorkspacePath, RedactionEngine.ReportFileName)),
+            Artifacts = report.Artifacts.Select(artifact => artifact with
+            {
+                Matches = artifact.Matches.Select(match => match with { Snippet = "[REDACTED]" }).ToArray(),
+            }).ToArray(),
+        };
+
+        var payload = new List<(string EntryPath, byte[] Bytes)>
+        {
+            (ReportEntryName, NoBom.GetBytes(RedactionReportJson.Serialize(exportedReport))),
         };
         foreach (var artifact in collection.Artifacts)
         {
@@ -92,15 +99,11 @@ public sealed class BundleExporter
                     $"staged copy listed by the collection is missing on disk: {artifact.StagedPath}");
             }
 
-            entries.Add(($"{StagingEntryPrefix}{artifact.StagedPath}", full));
+            payload.Add(($"{StagingEntryPrefix}{artifact.StagedPath}", File.ReadAllBytes(full)));
         }
 
         // Ordinal entry order regardless of artifact/report interleaving.
-        entries.Sort(static (a, b) => StringComparer.Ordinal.Compare(a.EntryPath, b.EntryPath));
-
-        var payload = entries
-            .Select(e => (e.EntryPath, Bytes: File.ReadAllBytes(e.FullPath)))
-            .ToList();
+        payload.Sort(static (a, b) => StringComparer.Ordinal.Compare(a.EntryPath, b.EntryPath));
 
         var artifactManifests = payload
             .Select(e => new BundleManifestArtifact

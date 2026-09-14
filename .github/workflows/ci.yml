@@ -4,6 +4,7 @@ on:
   pull_request:
   push:
     branches: [main]
+    tags: ['v*']
 
 jobs:
   build-test:
@@ -36,5 +37,37 @@ jobs:
       - name: Test (Release)
         run: dotnet test SupportSatchel.sln --configuration Release --no-build
 
+      - name: CLI process smoke (sanitized fixture)
+        run: >-
+          dotnet test tests/SupportSatchel.Cli.Tests/SupportSatchel.Cli.Tests.csproj
+          --configuration Release --no-build
+          --filter Category=ProcessSmoke
+
       - name: Dependency vulnerability scan
         run: dotnet list SupportSatchel.sln package --vulnerable --include-transitive
+
+      - name: Verify release tag matches assembly metadata
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: pwsh
+        run: |
+          $version = (& dotnet msbuild src/SupportSatchel.Cli/SupportSatchel.Cli.csproj -nologo -getProperty:Version).Trim()
+          if ($env:GITHUB_REF_NAME -ne "v$version") {
+            throw "Release tag '$env:GITHUB_REF_NAME' does not match assembly version 'v$version'."
+          }
+
+      - name: Publish and smoke unsigned preview
+        shell: pwsh
+        run: >-
+          ./eng/package-preview.ps1
+          -PlatformLabel ${{ matrix.os == 'windows-latest' && 'windows' || 'macos' }}
+          -OutputDirectory artifacts
+
+      - name: Upload unsigned tagged preview
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: support-satchel-unsigned-${{ matrix.os }}-${{ github.ref_name }}
+          path: |
+            artifacts/support-satchel-preview-*.zip
+            artifacts/support-satchel-preview-*.zip.sha256
+          if-no-files-found: error

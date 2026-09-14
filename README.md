@@ -63,17 +63,11 @@ Troubleshooting usually means scrambling across folders, grabbing the wrong file
 
 ## Current status
 
-Issue #4 complete: redaction engine (`SupportSatchel.Core.Redacting`)
-applies profile rules to staged collector copies only, exposes
-per-artifact original-vs-redacted previews for the review step, and emits
-a deterministic `redaction-report.json`; documented pattern limits live
-in [`docs/redaction.md`](./docs/redaction.md). Earlier: issue #2 profile
-domain model (`BundleProfile`, `CaptureSource`, `RedactionRule`,
-`ExportOptions`, `RunRecord`) with validation, canonical JSON
-serialization, and SQLite persistence + migration strategy
-([`docs/persistence.md`](./docs/persistence.md)); issue #3 collector
-pipeline with staging + provenance. Packaging, UI, and CLI proceed via
-the issue backlog.
+The Core profile store, collector, redaction engine, and deterministic
+bundle exporter are implemented. Issue #7 adds the local CLI workflow and
+unsigned preview packaging gates; see [`docs/cli.md`](./docs/cli.md) and
+[`docs/release.md`](./docs/release.md). The desktop UI in issue #6 remains
+pending, so no desktop workflow is claimed as tested.
 
 ## Milestones
 
@@ -83,17 +77,14 @@ the issue backlog.
 4. Desktop UI and accessibility pass
 5. Packaging and release artifacts
 
-## Development quickstart (planned)
+## Development quickstart
+
+Prerequisites: .NET 8 SDK and an Avalonia-supported desktop environment.
 
 ```bash
-# planned stack
-- .NET 8 SDK
-- Avalonia UI
-
-# once skeleton exists
-dotnet restore
-dotnet build
-dotnet test
+dotnet restore SupportSatchel.sln --locked-mode
+dotnet build SupportSatchel.sln --configuration Release --no-restore
+dotnet test SupportSatchel.sln --configuration Release --no-build
 ```
 
 ## Repository notes
@@ -101,4 +92,6 @@ dotnet test
 - Roadmap and execution plan: [`PLAN.md`](./PLAN.md)
 - Persistence schema + migration strategy: [`docs/persistence.md`](./docs/persistence.md)
 - Redaction engine semantics + documented limits: [`docs/redaction.md`](./docs/redaction.md)
-- Core domain and local persistence are implemented; UI/CLI workflows are backlog items.
+- Bundle packaging contract: [`docs/packaging.md`](./docs/packaging.md)
+- CLI lifecycle and JSON contract: [`docs/cli.md`](./docs/cli.md)
+- Unsigned preview and production signing checklist: [`docs/release.md`](./docs/release.md)

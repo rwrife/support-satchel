@@ -147,6 +147,25 @@ public class CollectorTests : IDisposable
         Assert.True(File.Exists(file));
     }
 
+    [Theory]
+    [InlineData("..")]
+    [InlineData("/")]
+    public void UnsafeSourceIdIsRejectedBeforeAnyCopy(string sourceId)
+    {
+        var source = WriteFixture("source/app.log", "must not be copied");
+        var workspaceRoot = Path.Combine(root, "ws");
+        var profile = ProfileWith(new CaptureSource
+        {
+            Id = sourceId,
+            Kind = SourceKind.File,
+            Path = source,
+        });
+
+        Assert.Throws<ArgumentException>(() =>
+            new Collector(new List<IDiagnosticProbe>()).Run(profile, workspaceRoot, Options()));
+        Assert.False(Directory.Exists(workspaceRoot));
+    }
+
     [Fact]
     public void MissingOptionalSourceIsSkippedAndRequiredSourceErrors()
     {

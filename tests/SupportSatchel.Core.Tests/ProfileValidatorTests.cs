@@ -63,6 +63,21 @@ public class ProfileValidatorTests
         Assert.Contains(result.Issues, i => i.Message.Contains("Duplicate source id", StringComparison.Ordinal));
     }
 
+    [Theory]
+    [InlineData(".")]
+    [InlineData("..")]
+    [InlineData("/")]
+    [InlineData("nested/source")]
+    [InlineData("nested\\source")]
+    public void SourceIdsMustBeSafeSinglePathSegments(string sourceId)
+    {
+        var source = new CaptureSource { Id = sourceId, Path = "/tmp/a" };
+
+        var result = ProfileValidator.Validate(TestProfiles.Valid(sources: [source]));
+
+        Assert.Contains(result.Issues, issue => issue.Path == "sources[0].id");
+    }
+
     [Fact]
     public void WildcardInSourcePathIsRejected()
     {

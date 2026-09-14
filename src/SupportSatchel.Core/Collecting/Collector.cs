@@ -63,6 +63,15 @@ public sealed class Collector
         options ??= new CollectorOptions();
         var now = options.Clock();
 
+        var unsafeSource = profile.Sources.FirstOrDefault(source =>
+            !ProfileValidator.IsSafePathSegment(source.Id));
+        if (unsafeSource is not null)
+        {
+            throw new ArgumentException(
+                "Profile contains a source id that is not a safe path segment.",
+                nameof(profile));
+        }
+
         var workspace = Path.Combine(
             workspaceRoot,
             "run-" + profile.Id.ToString("N"));
