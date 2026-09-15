@@ -24,9 +24,9 @@ local application-data `SupportSatchel` directory. `--output` and the
 action after inspecting the staged artifacts and report. The acknowledgment
 records intent only; it is not tamper resistance or cryptographic approval.
 
-## Lifecycle and the pending desktop UI
+## Lifecycle shared with the desktop UI
 
-The lifecycle shared with the planned desktop UI is:
+The lifecycle shared with the desktop UI is:
 
 1. **Select** a saved profile by exact name or GUID.
 2. **Capture** sources into a unique local run workspace; originals are
@@ -49,9 +49,12 @@ file reads or change content concurrently. Do not treat the workspace,
 `--reviewed`, or the generated checksum as protection from a malicious process
 running as the same user.
 
-Issue #6's desktop UI remains pending. This command contract is intended
-to align the future UI state machine, but no desktop selection, review, or
-export interaction is implemented or claimed as tested here.
+The issue #6 desktop UI uses the same production store, collector, redactor,
+and exporter. Unlike the CLI's persisted apply-then-review lifecycle, the
+interactive desktop performs a read-only preview after capture and delays
+`ApplyWorkspace` until the user reviews inclusions and acknowledges the exact
+current run. See [`desktop.md`](./desktop.md). Target-platform Windows/macOS
+manual UI and accessibility acceptance remains NOT RUN.
 
 ## Exit codes
 

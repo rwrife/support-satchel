@@ -63,11 +63,14 @@ Troubleshooting usually means scrambling across folders, grabbing the wrong file
 
 ## Current status
 
-The Core profile store, collector, redaction engine, and deterministic
-bundle exporter are implemented. Issue #7 adds the local CLI workflow and
-unsigned preview packaging gates; see [`docs/cli.md`](./docs/cli.md) and
-[`docs/release.md`](./docs/release.md). The desktop UI in issue #6 remains
-pending, so no desktop workflow is claimed as tested.
+The Core profile store, collector, redaction engine, deterministic bundle
+exporter, local CLI, and Avalonia desktop workflow are implemented. The desktop
+provides persisted profile CRUD and a gated capture → redaction review → export
+flow; see [`docs/desktop.md`](./docs/desktop.md). Automated controller and real
+temporary-file pipeline tests run on this Linux development host, but required
+manual Windows and macOS UI/accessibility acceptance remains **NOT RUN** and is
+an explicit release blocker. Unsigned preview packaging guidance is in
+[`docs/release.md`](./docs/release.md).
 
 ## Milestones
 
@@ -94,4 +97,5 @@ dotnet test SupportSatchel.sln --configuration Release --no-build
 - Redaction engine semantics + documented limits: [`docs/redaction.md`](./docs/redaction.md)
 - Bundle packaging contract: [`docs/packaging.md`](./docs/packaging.md)
 - CLI lifecycle and JSON contract: [`docs/cli.md`](./docs/cli.md)
+- Desktop operation, accessibility, and target-platform checklist: [`docs/desktop.md`](./docs/desktop.md)
 - Unsigned preview and production signing checklist: [`docs/release.md`](./docs/release.md)

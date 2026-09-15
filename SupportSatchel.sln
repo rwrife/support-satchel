@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportSatchel.Core.Tests",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportSatchel.Cli.Tests", "tests\SupportSatchel.Cli.Tests\SupportSatchel.Cli.Tests.csproj", "{37079740-039D-4D6D-A315-668D54927911}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SupportSatchel.App.Tests", "tests\SupportSatchel.App.Tests\SupportSatchel.App.Tests.csproj", "{E5FB0752-131D-4D3A-919F-B2CF94D46D5A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -46,6 +48,10 @@ Global
 		{37079740-039D-4D6D-A315-668D54927911}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{37079740-039D-4D6D-A315-668D54927911}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{37079740-039D-4D6D-A315-668D54927911}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E5FB0752-131D-4D3A-919F-B2CF94D46D5A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E5FB0752-131D-4D3A-919F-B2CF94D46D5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E5FB0752-131D-4D3A-919F-B2CF94D46D5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E5FB0752-131D-4D3A-919F-B2CF94D46D5A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{98371C88-B287-403E-9DE2-7CEA96AA1AD5} = {C8C1AECC-C4A6-4749-A297-75FDE5F85DF8}
@@ -53,5 +59,6 @@ Global
 		{9482E751-61E7-4B6B-9400-DB1D028A019F} = {C8C1AECC-C4A6-4749-A297-75FDE5F85DF8}
 		{52FE18D3-8572-4DAE-A7C1-F2C7DB87B8BA} = {B8CC60E6-38C5-4983-8B68-920A133CD7CA}
 		{37079740-039D-4D6D-A315-668D54927911} = {B8CC60E6-38C5-4983-8B68-920A133CD7CA}
+		{E5FB0752-131D-4D3A-919F-B2CF94D46D5A} = {B8CC60E6-38C5-4983-8B68-920A133CD7CA}
 	EndGlobalSection
 EndGlobal

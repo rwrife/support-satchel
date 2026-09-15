@@ -1,10 +1,184 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="SupportSatchel.App.MainWindow"
-        Width="800" Height="500"
-        Title="Support Satchel">
-  <StackPanel Margin="24" Spacing="8">
-    <TextBlock Text="Support Satchel" FontSize="24" />
-    <TextBlock Text="Skeleton build. UI workflows arrive with issue #6." />
-  </StackPanel>
+        Width="1180" Height="780" MinWidth="900" MinHeight="640"
+        Title="Support Satchel — local privacy-first support bundles"
+        AutomationProperties.Name="Support Satchel main window">
+  <Window.Styles>
+    <Style Selector="TextBlock.heading">
+      <Setter Property="FontSize" Value="24" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="TextBlock.section">
+      <Setter Property="FontSize" Value="18" />
+      <Setter Property="FontWeight" Value="SemiBold" />
+      <Setter Property="Margin" Value="0,8,0,4" />
+    </Style>
+    <Style Selector="TextBlock.help">
+      <Setter Property="Foreground" Value="Gray" />
+      <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="TextBox">
+      <Setter Property="MinHeight" Value="34" />
+    </Style>
+    <Style Selector="Button">
+      <Setter Property="MinHeight" Value="34" />
+      <Setter Property="Padding" Value="12,6" />
+    </Style>
+  </Window.Styles>
+
+  <Grid RowDefinitions="Auto,*,Auto" Background="{DynamicResource SystemControlBackgroundAltHighBrush}">
+    <Border Grid.Row="0" Padding="22,16" Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+      <StackPanel Spacing="3">
+        <TextBlock Classes="heading" Text="Support Satchel" />
+        <TextBlock Text="Create a reusable profile, capture locally, review every redaction, then export manually. No account or network is required."
+                   TextWrapping="Wrap" />
+      </StackPanel>
+    </Border>
+
+    <Grid Grid.Row="1" ColumnDefinitions="290,*" Margin="16" ColumnSpacing="16">
+      <Border Grid.Column="0" Padding="14" CornerRadius="8" Background="{DynamicResource SystemControlBackgroundAltHighBrush}"
+              BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" BorderThickness="1">
+        <Grid RowDefinitions="Auto,*,Auto,Auto">
+          <TextBlock Grid.Row="0" Classes="section" Text="1. Select profile" />
+          <ListBox x:Name="ProfileList" Grid.Row="1" Margin="0,6,0,10"
+                   ItemsSource="{Binding Profiles}"
+                   SelectedItem="{Binding SelectedProfile, Mode=TwoWay}"
+                   IsEnabled="{Binding CanNavigateProfiles}"
+                   AutomationProperties.Name="Saved bundle profiles">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Margin="4" Spacing="2">
+                  <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                  <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="Gray" />
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <UniformGrid Grid.Row="2" Columns="2" Rows="3" Margin="0,0,0,8">
+            <Button x:Name="NewProfileButton" Margin="2" Content="_New profile" Command="{Binding NewCommand}"
+                    IsEnabled="{Binding CanNavigateProfiles}" HotKey="Ctrl+N"
+                    AutomationProperties.Name="New profile, Control N" />
+            <Button x:Name="SaveProfileButton" Margin="2" Content="_Save profile" Command="{Binding SaveCommand}"
+                    IsEnabled="{Binding CanInteract}" HotKey="Ctrl+S"
+                    AutomationProperties.Name="Save profile, Control S" />
+            <Button x:Name="DuplicateProfileButton" Margin="2" Content="D_uplicate" Command="{Binding DuplicateCommand}"
+                    IsEnabled="{Binding CanUseSelectedProfileActions}" HotKey="Ctrl+D"
+                    AutomationProperties.Name="Duplicate selected profile, Control D" />
+            <Button x:Name="RevertProfileButton" Margin="2" Content="_Revert edits" Command="{Binding RevertCommand}"
+                    IsEnabled="{Binding CanRevertProfile}"
+                    AutomationProperties.Name="Revert unsaved profile edits" />
+            <Button x:Name="DeleteProfileButton" Margin="2" Content="_Delete" Command="{Binding DeleteCommand}"
+                    IsEnabled="{Binding CanDelete}"
+                    AutomationProperties.Name="Delete selected profile after typed confirmation" />
+          </UniformGrid>
+          <StackPanel Grid.Row="3" Spacing="4">
+            <TextBlock Text="Type the exact selected profile name to enable a safe deletion attempt:" TextWrapping="Wrap" />
+            <TextBox x:Name="DeleteConfirmationTextBox" Text="{Binding DeleteConfirmation, Mode=TwoWay}"
+                     IsEnabled="{Binding CanUseSelectedProfileActions}"
+                     Watermark="Exact profile name"
+                     AutomationProperties.Name="Exact profile name deletion confirmation" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <TabControl x:Name="WorkflowTabs" Grid.Column="1" AutomationProperties.Name="Profile and bundle workflow tabs">
+        <TabItem Header="Profile editor">
+          <ScrollViewer Padding="18" VerticalScrollBarVisibility="Auto">
+            <StackPanel x:Name="ProfileEditorPanel" Spacing="7" IsEnabled="{Binding CanInteract}">
+              <TextBlock Classes="section" Text="Profile editor" />
+              <TextBlock Classes="help" Text="Basic fields control identity. Advanced JSON controls real collection sources, ordered redaction rules, and ZIP packaging. Save validates the complete production profile before writing SQLite." />
+              <TextBlock x:Name="UnsavedProfileWarning"
+                         Text="Unsaved changes are protected. Save profile or Revert edits before selecting another profile or using New, Duplicate, Delete, or Capture. Revert resets an unsaved new draft to defaults."
+                         IsVisible="{Binding IsProfileDirty}" Foreground="DarkOrange"
+                         AutomationProperties.Name="Unsaved profile changes warning" />
+              <TextBlock Text="Profile name (required)" />
+              <TextBox Text="{Binding ProfileName, Mode=TwoWay}"
+                       AutomationProperties.Name="Profile name, required" />
+              <TextBlock Text="Description" />
+              <TextBox Text="{Binding ProfileDescription, Mode=TwoWay}" AcceptsReturn="True" MinHeight="62"
+                       AutomationProperties.Name="Profile description" />
+              <TextBlock Text="Advanced configuration JSON (required)" />
+              <TextBlock Classes="help" Text="sources: file/folder path, includePatterns, excludePatterns, required. redaction.rules: id, name, .NET regular expression, replacement, enabled. export: bundleNameTemplate (must include {profile} and {utc}), deterministic, includeManifest." />
+              <TextBox Text="{Binding ConfigurationJson, Mode=TwoWay}"
+                       AcceptsReturn="True" FontFamily="monospace"
+                       MinHeight="390" ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                       AutomationProperties.Name="Advanced source redaction and packaging configuration JSON" />
+            </StackPanel>
+          </ScrollViewer>
+        </TabItem>
+
+        <TabItem Header="Capture, review, export">
+          <ScrollViewer Padding="18" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="section" Text="2. Capture" />
+              <TextBlock Classes="help" Text="Capture reads the selected saved profile's sources into a unique local staging workspace. Save or revert editor changes first. Originals are never modified. Starting capture clears every earlier review and export state." />
+              <Button HorizontalAlignment="Left" Content="_Capture selected profile" Command="{Binding CaptureCommand}" HotKey="Ctrl+R"
+                      AutomationProperties.Name="Capture selected profile, Control R" />
+
+              <TextBlock Classes="section" Text="3. Review redactions and contents" />
+              <TextBlock Classes="help" Text="Select each artifact. Original text is shown here only for your deliberate local review; match snippets are never copied into UI errors or exported reports. Binary files cannot be text-redacted—exclude them unless you have inspected them separately." />
+              <Grid ColumnDefinitions="260,*" MinHeight="280" ColumnSpacing="12">
+                <ListBox x:Name="ReviewList" Grid.Column="0" ItemsSource="{Binding ReviewArtifacts}"
+                         SelectedItem="{Binding SelectedReviewArtifact, Mode=TwoWay}"
+                         IsEnabled="{Binding CanInteract}"
+                         AutomationProperties.Name="Captured artifacts for review">
+                  <ListBox.ItemTemplate>
+                    <DataTemplate>
+                      <StackPanel Margin="3" Spacing="2">
+                        <CheckBox IsChecked="{Binding IsIncluded, Mode=TwoWay}"
+                                  AutomationProperties.Name="{Binding StagedPath, StringFormat='Include artifact {0} in export'}">
+                          <TextBlock Text="{Binding StagedPath}" TextWrapping="Wrap" />
+                        </CheckBox>
+                        <TextBlock Text="{Binding Kind, StringFormat='Kind: {0}'}" Foreground="Gray" />
+                        <TextBlock Text="{Binding MatchCount, StringFormat='Redaction matches: {0}'}" Foreground="Gray" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </ListBox.ItemTemplate>
+                </ListBox>
+                <Grid Grid.Column="1" RowDefinitions="Auto,*,Auto,*" RowSpacing="4">
+                  <TextBlock Grid.Row="0" Text="Original staged text (private; not exported as shown)" />
+                  <TextBox Grid.Row="1" Text="{Binding SelectedReviewArtifact.OriginalText}" IsReadOnly="True"
+                           AcceptsReturn="True" FontFamily="monospace" MinHeight="110"
+                           ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                           AutomationProperties.Name="Original private staged text preview" />
+                  <TextBlock Grid.Row="2" Margin="0,8,0,0" Text="Sanitized export preview" />
+                  <TextBox Grid.Row="3" Text="{Binding SelectedReviewArtifact.RedactedText}" IsReadOnly="True"
+                           AcceptsReturn="True" FontFamily="monospace" MinHeight="110"
+                           ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollBarVisibility="Auto"
+                           AutomationProperties.Name="Sanitized export text preview" />
+                </Grid>
+              </Grid>
+              <CheckBox x:Name="ReviewAcknowledgment"
+                        IsChecked="{Binding ReviewAcknowledged, Mode=TwoWay}"
+                        IsEnabled="{Binding CanInteract}"
+                        AutomationProperties.Name="I reviewed every included artifact and understand binary files are exported without text redaction">
+                <TextBlock Text="I reviewed every included artifact and understand that included binary files are exported without text redaction."
+                           TextWrapping="Wrap" />
+              </CheckBox>
+
+              <TextBlock Classes="section" Text="4. Export" />
+              <TextBlock Classes="help" Text="Enter a local output directory. Export applies the reviewed redactions, packages only included artifacts, writes manifest/checksum evidence, and makes no upload or network request. Every attempt consumes this review; capture again after success or failure." />
+              <TextBlock Text="Export directory (required)" />
+              <TextBox Text="{Binding ExportDirectory, Mode=TwoWay}" Watermark="Example: C:\Users\me\Desktop or /Users/me/Desktop"
+                       AutomationProperties.Name="Local export directory, required" />
+              <Button HorizontalAlignment="Left" Content="_Export reviewed bundle" Command="{Binding ExportCommand}" HotKey="Ctrl+E"
+                      AutomationProperties.Name="Export reviewed bundle, Control E" />
+              <TextBlock Text="{Binding BundlePath, StringFormat='Bundle: {0}'}" TextWrapping="Wrap"
+                         AutomationProperties.Name="Generated bundle path" />
+            </StackPanel>
+          </ScrollViewer>
+        </TabItem>
+      </TabControl>
+    </Grid>
+
+    <Border Grid.Row="2" Padding="16,10" Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+      <StackPanel Spacing="3">
+        <TextBlock Text="{Binding StatusMessage}" TextWrapping="Wrap"
+                   AutomationProperties.Name="Workflow status" AutomationProperties.LiveSetting="Polite" />
+        <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" Foreground="Crimson"
+                   AutomationProperties.Name="Workflow error" AutomationProperties.LiveSetting="Assertive" />
+      </StackPanel>
+    </Border>
+  </Grid>
 </Window>
