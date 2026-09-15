@@ -148,6 +148,14 @@ public sealed class MainWindowTests : IDisposable
     {
         if (Directory.Exists(_root))
         {
+            // Disposed pooled SQLite connections retain file handles on Windows.
+            // Clear only this fixture's pool; other tests may still be using theirs.
+            using var connection = new Microsoft.Data.Sqlite.SqliteConnection(
+                new Microsoft.Data.Sqlite.SqliteConnectionStringBuilder
+                {
+                    DataSource = Path.Combine(_root, "profiles.db"),
+                }.ToString());
+            Microsoft.Data.Sqlite.SqliteConnection.ClearPool(connection);
             Directory.Delete(_root, recursive: true);
         }
     }
