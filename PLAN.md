@@ -89,3 +89,10 @@ Build a local-first desktop utility for Windows/macOS that creates sanitized tro
 - Hidden telemetry
 - Any automatic sharing outside user intent
 - Claims of forensic-grade completeness in MVP
+
+## Current desktop validation status
+
+The issue #6 Avalonia workflow and automated controller/integration coverage are
+implemented. Real Windows and macOS manual operation, keyboard, scaling, and
+screen-reader checklists are still **NOT RUN** on the Linux implementation host;
+this is an acceptance blocker documented in `docs/desktop.md`.
