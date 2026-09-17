@@ -157,10 +157,31 @@ implementation and a green rerun (all commands used `~/.dotnet/dotnet`):
 | Unsaved profile navigation guard | Four focused controller/headless tests failed because saved edits and new-draft values were replaced by profile actions, and CRUD controls had no dirty-state enabled bindings. | The same focused filter passed 4/4 after gating profile selection/New/Duplicate/Delete, tracking new drafts as dirty, binding actual enabled states, and making Revert reset new-draft defaults. |
 | Avalonia view | `dotnet build src/SupportSatchel.App/SupportSatchel.App.csproj --no-restore` — XAML compile failed on unqualified scrollbar attached properties. | Same command — succeeded with 0 warnings and 0 errors after correcting the Avalonia property syntax. |
 
+## Linux X11 desktop-lifetime smoke evidence (not platform acceptance)
+
+Recorded 2026-09-17 on the Linux implementation host. This is the strongest
+evidence obtainable here and it is explicitly **not** a substitute for the
+Windows/macOS checklists below.
+
+- Environment: Xvfb `:99`, `1280x800x24`, Release build (`net8.0`), .NET SDK
+  8.0.424, isolated `XDG_DATA_HOME`/`XDG_CONFIG_HOME` under `/tmp`.
+- Result: the real `SupportSatchel.App` executable started under the classic
+  desktop lifetime, opened an X11 display connection, stayed running until the
+  45-second `timeout` expired (exit code 124), and its log's only X-related line
+  is `X connection to :99 broken (explicit kill or server shutdown)` from the
+  server teardown. No XAML load, resource, or runtime exception output.
+- What this proves: the full (non-headless) Avalonia desktop path loads
+  `App.axaml`/`MainWindow.axaml`, instantiates `MainWindow`, and reaches a
+  stable running state on a real windowing platform.
+- What this does not prove: Windows Narrator/UIA, macOS VoiceOver, DPI scaling,
+  packaged-app launch, native file/privacy behavior, or any checklist item
+  below.
+
 ## Platform manual acceptance checklist
 
-This implementation host is Linux. Linux compilation and controller/integration
-tests do **not** substitute for target-platform desktop accessibility testing.
+This implementation host is Linux. Linux compilation, headless tests, and the
+X11 smoke above do **not** substitute for target-platform desktop accessibility
+testing.
 
 ### Windows 10/11 — NOT RUN
 
